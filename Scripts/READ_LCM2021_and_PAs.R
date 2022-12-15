@@ -31,6 +31,7 @@ library(tidyverse)
 dirData<- "../Data/"
 
 # 2021 Land Cover Map
+# Available: https://catalogue.ceh.ac.uk/documents/017313c6-954b-4343-8784-3d61aa6e44da
 LCM2021 <- paste0(dirData, "LCM/gblcm10m2021.tif") %>%
   rast(.) %>%
   .[[1]]
@@ -39,6 +40,7 @@ LCM2021 <- paste0(dirData, "LCM/gblcm10m2021.tif") %>%
 names(LCM2021) <- "Identifier"
 
 # Scottish SSSI
+# Available: https://www.data.gov.uk/dataset/d64bf689-4ce8-465b-b00e-6a57dec94a22/site-of-special-scientific-interest-scotland
 scotSSSI <- paste0(dirData, "SSSI/Scotland/SSSI_SCOTLAND.shp") %>%
   vect(.)
 
