@@ -143,4 +143,4 @@ scotSSSI_df$MainCover <- max.col(scotSSSI_df[, colNumsLCM],
 
 # Save to file
 saveRDS(scotSSSI_df, 
-        file = paste0(dirData, "Processed/ScotSSSI_landcover.Rda"))
+        file = paste0(dirData, "Processed/ScotSSSI_landcover.rds"))
