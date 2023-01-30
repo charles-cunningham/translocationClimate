@@ -17,7 +17,7 @@
 
 # LOAD LIBRARIES & INSTALL PACKAGES ----------------------
 
-# Change library to R: (C: doesn't have enough space for packages):
+# Change library to R: (C: doesn't have enough space for packages)
 .libPaths("R:/rsrch/cb751/lab/Charles/R/PackageLibrary")
 
 # Load packages
@@ -61,11 +61,9 @@ walesSSSI <- paste0(dirData,
   vect(.)
 
 # List of all three national SSSI object strings
-allSSSI <- tibble(
-  Nation =     c("England", "Scotland", "Wales"),
-  SSSIobject = c("engSSSI", "scotSSSI", "walesSSSI"),
-  UniqueID =   c("GID",     "PA_CODE",  "SSSI_ID")
-)
+allSSSI <- tibble( Nation =     c("England", "Scotland", "Wales"),
+                   SSSIobject = c("engSSSI", "scotSSSI", "walesSSSI"),
+                   UniqueID =   c("GID",     "PA_CODE",  "SSSI_ID"))
 
 ### LCM classes
 
