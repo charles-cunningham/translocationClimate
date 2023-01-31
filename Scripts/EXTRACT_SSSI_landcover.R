@@ -65,7 +65,7 @@ allSSSI <- tibble( Nation =     c("England", "Scotland", "Wales"),
                    SSSIobject = c("engSSSI", "scotSSSI", "walesSSSI"),
                    UniqueID =   c("GID",     "PA_CODE",  "SSSI_ID"))
 
-### LCM classes
+# DEFINE LCM CLASSES ---------------------------------------
 
 # Specify the LCM classes, add on "No Data"
 classLCM <- c(
