@@ -140,7 +140,7 @@ for (i in 1: NROW(allSSSI)) {
     SSSI_j <- subset(SSSI,
                      subset = values(SSSI)[, uniqueID] == SSSI_df[j, uniqueID])
     
-    # Extract all 25m cells for each land cover class present for SSSI 'i'
+    # Extract all 25m cells for each land cover class present for SSSI 'j'
     SSSIcells <- terra::extract(LCM2021, SSSI_j)
     
     # Count number of cells for each class
@@ -155,8 +155,7 @@ for (i in 1: NROW(allSSSI)) {
       replace_na(list(PercentCover = 0)) # Convert PercentCover NAs to 0
     
     # Add proportion coverage for each class to SSSI data frame (row j)
-    SSSI_df[j, colNumsLCM] <-
-      SSSIcount$PercentCover
+    SSSI_df[j, colNumsLCM] <- SSSIcount$PercentCover
     
     # Iterate progress bar
     setTxtProgressBar(progressBar, j)
