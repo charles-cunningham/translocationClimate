@@ -1,0 +1,198 @@
+# HEADER ---------------------------------------------------------------
+#
+# Author: Charles Cunningham
+# Email: charles.cunningham@york.ac.uk
+# 
+# Script name: Plot BVW records with climate analogues to identify
+# potential source populations
+#
+# Script Description: ...
+
+# LOAD LIBRARIES & INSTALL PACKAGES ---------------------
+
+# Change  library to R: (not enough space on C:)
+.libPaths("R:/rsrch/cb751/lab/Charles/R/PackageLibrary")
+
+# Load packages
+library(terra)
+library(sf)
+library(tidyverse)
+library(cowplot)
+
+# Set fraction of RAM that may be used by the program
+terraOptions(memfrac = 0.9)
+
+# LOAD SPATIAL AND CLIMATE DATA -----------------------
+
+# Climate data
+climQuantsMerge <- rast("../Data/ProcessedData/climQuantsMerge.tif")
+
+# Land map
+land <- vect("../Data/land.shp")
+
+# Species records
+BVW_records <- vect("../Data/BVW_records.shp")
+
+# Reintroduction sites
+sites <- vect("../Data/reintroductionSites.shp",
+              crs = "EPSG:4326")
+
+# SET PARAMETERS ---------------------------------------
+# N.B. Cannot plot with decimal values as issue with large memory spatRaster,
+# so use integers (use labels as guide)
+
+# Set labels (N.B. note for integer interpretation)
+plotLabels <- c("0" = ">50%",
+                "1" = "50%",
+                "2" = "40%",
+                "3" = "30%",
+                "4" = "20%")
+# Set colours
+plotColours <- c("0" = "#E5FFFF",
+                 "1" = "#99E5FF",
+                 "2" = "#65BFFF",
+                 "3" = "#3288FF",
+                 "4" = "#003FFF")
+# Plot breaks
+plotBreaks <- c("4", "3", "2", "1", "0")
+
+# Set 'cut-out' extents for Brittany and Eastern Pyrenees 
+extentBrittany <- c(xmin = -6, xmax = 0, ymin = 46, ymax = 49)
+extentPyrenees <- c(xmin = -2, xmax = 4, ymin = 40.5, ymax = 44.3)
+
+# PROCESS CLIMATE QUANTILE MAPS ---------------------------
+
+# Find cells which are within a given quantile for temperature climate covariates only
+tempQuants <- subset(climQuantsMerge,
+                     "totalRain",
+                     negate = TRUE) %>%
+  min
+
+# Extract temperature quant (into "min" column)
+BVW_records <- terra::extract(tempQuants, BVW_records, bind = TRUE)
+
+# Add column for plot (are coordinates within 20% quantile or not)
+BVW_records$similarity <- if_else(BVW_records$min == 4, "Similar", "Not similar")
+
+# Drop "min" column
+BVW_records$min <- NULL
+
+# CREATE ZOOMED IN MAPS -----------------------------------
+
+# Loop through extents
+for (i in c("extentBrittany", "extentPyrenees")) {
+
+  # Cut out land
+  zoomLand <- crop(land, get(i))
+  
+  # Cut out temperature quantiles
+  zoomQuants <- crop(tempQuants, get(i))
+  
+  # Cut out records and subset to only current records
+  zoomBVW_records <- BVW_records %>%
+    subset(BVW_records$plotType == "Current") %>%
+    crop(get(i))
+    
+# Plot
+tempQuantMap <- ggplot(data = as.data.frame(zoomQuants, xy = TRUE) %>% 
+                         na.omit()) +
+  
+  # Set equal coordinates
+  coord_equal() +
+  
+  # Climate raster
+  geom_raster( aes(x = x, y = y,
+                   fill = factor(min))) +
+  
+  # Country boundary polygons
+  geom_sf(data = st_as_sf(zoomLand), fill = NA,
+          colour = "black") +
+  
+  # Plot records outside top 20% quantile
+  geom_sf(data = st_as_sf(zoomBVW_records),
+          inherit.aes = FALSE,
+          aes( colour = similarity),
+          size = 0.5) +
+  
+  # Set aesthetics
+  scale_fill_manual("\nClimate\nsimilarity\nquantile",
+                      values = plotColours,
+                      labels = plotLabels,
+                      breaks = plotBreaks) +
+  scale_colour_manual("",
+                    values = c("#EBCC2A", "#F21A00"),
+                    labels = c("Records within\n20% temperature\nquantile\n",
+                               "Other records"),
+                    breaks = c("Similar", "Not similar")) +
+  guides(colour = guide_legend(override.aes = list(size = 6))) +
+  
+  # Set theme parameters
+  theme_void() +
+  theme(legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+
+# Assign to object
+assign(paste0(i, "_panel"), tempQuantMap)
+
+}
+
+# PLOT OVERVIEW MAPS -------------------------------------------
+
+# Loop through extents
+for (i in c("extentBrittany", "extentPyrenees")) {
+
+overviewMap <- ggplot() +
+  
+  # Set coordinates
+  coord_cartesian() +
+  
+  # Country boundary polygons
+  geom_sf(data = st_as_sf(land), fill = NA,
+          colour = "black", inherit.aes = FALSE) +
+  
+  # Add panel border 
+  geom_rect(data = ext(land) %>% as.vector() %>% t %>% data.frame(),
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = NA, col = "black") +
+  
+  # Plot Brittany extent
+  geom_rect(data = get(i) %>% t %>% data.frame(),
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            fill = NA, col = "#F21A00") +
+
+  # Set theme parameters
+  theme_void()
+
+# Assign to object
+assign(paste0(i, "_overview"), overviewMap)
+
+}
+
+# COMBINE PANELS INTO SINGLE PLOT ------------------------------
+
+# Extract legend from one panel
+legend <- get_legend(extentPyrenees_panel)
+
+# Add plots together
+combinedPlot <- ggdraw() +
+  draw_plot(extentBrittany_panel + theme(legend.position="none"),
+            0, 0, 0.5, 1) +
+  draw_plot(extentPyrenees_panel + theme(legend.position="none"), 
+            0.5, 0, 0.5, 1) +
+  draw_plot(extentBrittany_overview, 0, 0.05, 0.25, 0.25) +
+  draw_plot(extentPyrenees_overview, 0.8, 0.05, 0.25, 0.25) +
+  cowplot::draw_label("(a)", 0.015, 0.96, size = 22) +
+  cowplot::draw_label("(b)", 0.525, 0.96, size = 22) +
+  theme(plot.background = element_rect( fill = "white", colour = "white"))
+  
+# Add legend
+combinedPlot <- plot_grid(combinedPlot,
+                          legend,
+                          rel_widths = c(3, .5))
+
+# Save
+ggsave(filename = paste0("../Plots/", "zoomRecords.png"),
+       combinedPlot,
+       dpi = 600,
+       units = "px", width = 8000, height = 3000)
+
