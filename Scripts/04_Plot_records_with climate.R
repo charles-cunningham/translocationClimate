@@ -6,7 +6,8 @@
 # Script name: Plot BVW records with climate analogues to identify
 # potential source populations
 #
-# Script Description: ...
+# Script Description: Using data created in previous scripts, plot BVW records
+# and climate quantiles with zoomed in regions and overview maps
 
 # LOAD LIBRARIES & INSTALL PACKAGES ---------------------
 
@@ -68,7 +69,7 @@ tempQuants <- subset(climQuantsMerge,
                      negate = TRUE) %>%
   min
 
-# Extract temperature quant (into "min" column)
+# Extract temperature quantile (into "min" column)
 BVW_records <- terra::extract(tempQuants, BVW_records, bind = TRUE)
 
 # Add column for plot (are coordinates within 20% quantile or not)
@@ -195,4 +196,3 @@ ggsave(filename = paste0("../Plots/", "zoomRecords.png"),
        combinedPlot,
        dpi = 600,
        units = "px", width = 8000, height = 3000)
-

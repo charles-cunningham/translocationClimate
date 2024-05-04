@@ -5,7 +5,7 @@
 # 
 # Script name: Plot black-veined white records
 #
-# Script Description: Plot black-veined white records for:
+# Script Description: Process and plot black-veined white records for:
 # i.   2014-2023 inclusive
 # ii.  pre-1925 records for Britain only
 # iii. both 2014-2023 inclusive and pre-1925 records for Britain only
@@ -120,9 +120,10 @@ BVW_vect <- vect(BVW_df, geom = c("decimalLongitude", "decimalLatitude"),
 # Mask to land
 BVW_vect <- mask(BVW_vect, land)
 
+# Only keep single plot data column to save memory for saving
 BVW_plot_vect <- BVW_vect[,"plotType"]
 
-# Save for future plotting (only save plot column to save memory)
+# Save for future plotting
 writeVector(BVW_plot_vect,
             "../Data/BVW_records.shp",
             overwrite = TRUE)

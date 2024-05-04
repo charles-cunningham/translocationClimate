@@ -5,7 +5,7 @@
 # 
 # Script name: Find climate analogues for potential UK release sites
 #
-# Script Description: Use release point locations in south England to 
+# Script Description: Use possible release locations to 
 # find suitable climate analogues in continental Europe.
 
 # LOAD LIBRARIES & INSTALL PACKAGES ---------------------
@@ -83,11 +83,12 @@ siteClimate <- terra::extract(climCovar, sites, ID = FALSE)
 # Find mean of reintroduction sites
 siteClimateMean <- colMeans(siteClimate)
 
-# Calculate difference between sites and all other European climate values
+# Calculate difference between site mean and all other European climate values
 diffR <- abs(climCovar - siteClimateMean)
 
 # Find quantile limits for each quantile, and each climate variable, and print
-quantLimits <- global(diffR, quantile, probs = quants, na.rm = TRUE); print(quantLimits)
+quantLimits <- global(diffR, quantile, probs = quants, na.rm = TRUE)
+print(quantLimits)
 
 # Find cells within quantile limit for each climate variable, for each quantile
 climQuants <- apply(quantLimits,
@@ -278,16 +279,12 @@ ggsave(filename = paste0("../Plots/", "Climate_similarity_temp.png"),
 
 # SAVE SPATRASTERS --------------------------------------------------
 
-### Separate climate variables
-
-# Save
+# Save separate climate variables
 writeRaster(climQuantsMerge,
             paste0("../Data/ProcessedData/climQuantsMerge.tif"),
             overwrite = TRUE)
 
-### All climate variables
-
-# Save
+# Save all climate variables
 writeRaster(allQuants,
             paste0("../Data/ProcessedData/climQuantsAll.tif"),
             overwrite = TRUE)

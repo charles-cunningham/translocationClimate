@@ -29,7 +29,7 @@ terraOptions(memfrac = 0.9)
 # Data directory
 dataDir <-  "../Data/ClimateData"
 
-# LOAD COUNTY BOUNDARIES -------------------------------------------
+# LOAD COUNTRY BOUNDARIES -------------------------------------------
 
 # Download countries
 land <- geodata::world(resolution=1,
@@ -64,7 +64,7 @@ land <- aggregate(land)
 # Version: 1.0
 # Format: Zip file(.zip)
 
-### For each variable, select the following parameters and download seperately: 
+### For each variable, select the following parameters and download separately: 
 
 ### Growing Degree Days (GDD5)
 # Variable: Vegetation sensitive indicators -> Growing degree days
