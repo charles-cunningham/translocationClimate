@@ -3,7 +3,7 @@
 # Author: Charles Cunningham
 # Email: charles.cunningham@york.ac.uk
 # 
-# Script name: Plot black-veined white records
+# Script name: Plot black-veined white (BVW) records
 #
 # Script Description: Process and plot black-veined white records for:
 # i.   2014-2023 inclusive

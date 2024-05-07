@@ -6,7 +6,7 @@
 # Script name: Aggregate climate quantiles into single plots
 #
 # Script Description: Generate single 'climate' quantiles based on
-# all climate data, and only temperate-related cliamte data
+# all climate data, and only temperature-related climate data
 # N.B. Takes several hours to complete
 
 # LOAD LIBRARIES & INSTALL PACKAGES ---------------------
