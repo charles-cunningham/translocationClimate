@@ -113,7 +113,7 @@ allQuantMap <- ggplot(allQuants_df) +
   theme_void() +
   theme(plot.background = element_rect(fill = "white",
                                        colour = "white"),
-        legend.position = c(0.15,0.5),
+        legend.position = c(0.15, 0.5),
         legend.title = element_text(size=24),
         legend.text = element_text(size=24))
 
@@ -172,7 +172,7 @@ tempQuantMap <- ggplot(data = tempQuants_df) +
   theme_void() +
   theme(plot.background = element_rect(fill = "white",
                                        colour = "white"),
-        legend.position = c(0.15,0.5),
+        legend.position = c(0.15, 0.5),
         legend.title = element_text(size=24),
         legend.text = element_text(size=24))
 
