@@ -149,13 +149,13 @@ writeRaster(GDD5_R,
             paste0("../Data/ProcessedData/GDD5.tif"),
             overwrite = TRUE)
 writeRaster(MTCO_R,
-            paste0("../Data//ProcessedData/MTCO.tif"),
+            paste0("../Data/ProcessedData/MTCO.tif"),
             overwrite = TRUE)
 writeRaster(tasCV_R,
-            paste0("../Data//ProcessedData/tasCV.tif"),
+            paste0("../Data/ProcessedData/tasCV.tif"),
             overwrite = TRUE)
 writeRaster(RAIN_R,
-            paste0("../Data//ProcessedData/RAIN.tif"),
+            paste0("../Data/ProcessedData/RAIN.tif"),
             overwrite = TRUE)
 
 # Write land map

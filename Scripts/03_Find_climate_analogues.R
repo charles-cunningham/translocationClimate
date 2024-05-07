@@ -59,18 +59,26 @@ plotColours <- c("0" = "#E5FFFF",
 # Plot breaks
 plotBreaks <- c("4", "3", "2", "1", "0")
 
-#Set facet labels
-facetLabeller <- data.frame(
+# Set title labels
+titleLabeller <- data.frame(
   climateVariable = c("growingDegreeDays",
                       "MTCO",
                       "tasCV",
                       "totalRain"),
-  label = c("Growing degree days similarity to\npotential UK translocation sites",
-            "Mean temperature of coldest month (K) similarity to\npotential UK translocation sites",
-            "Temperature seasonality similarity to\npotential UK translocation sites",
-            "Total annual precipitation (mm) similarity to\npotential UK translocation sites"))
-  
-# EXTRACT CLIMATE NEAR REINTRODUCTION SITES --------------------
+  label = c("Growing degree days\nabove 5°C similarity",
+            "Mean temperature of coldest\nmonth similarity",
+            "Temperature seasonality\nsimilarity",
+            "Total annual precipitation\nsimilarity"))
+
+# Set index labels
+indexLabeller <- data.frame(
+  climateVariable = c("growingDegreeDays",
+                      "MTCO",
+                      "tasCV",
+                      "totalRain"),
+  label = c("(a)", "(b)", "(c)", "(d)"))
+
+# EXTRACT CLIMATE NEAR POTENTIAL REINTRODUCTION SITES --------------------
 
 # Combine climate covariates into single spatRaster
 climCovar <- c(GDD5_R, MTCO_R, tasCV_R, RAIN_R)
@@ -116,6 +124,10 @@ climQuantsMerge <- lapply(1:nlyr(climCovar), function(x) { # For each climate va
   # Then combine each climate spatRaster together
   rast
 
+# Remove redundant objects and clear memory
+rm(climCovar, diffR, climQuants)
+gc()
+
 ###  PLOT INDIVIDUAL CLIMATE VARIABLES -------------------------
 
 # Create data frame from climQuantsMerge for plot
@@ -131,7 +143,7 @@ climQuantMap <- ggplot(data = climQuantsMerge_df) +
   # Set equal coordinates
   coord_equal() +
   
-  # Land cover raster
+  # Climate raster
   geom_tile( aes(x = x, y = y,
                  colour = factor(value), fill = factor(value))) +
   facet_wrap(~ climateVariable) +
@@ -149,12 +161,17 @@ climQuantMap <- ggplot(data = climQuantsMerge_df) +
   geom_sf(data = st_as_sf(sites),
           colour = "#D91630", inherit.aes = FALSE) +
   
-  # Add facet labels
-  geom_text(data = facetLabeller,
-            x = 2, y = 72,
+  # Add title and index labels
+  geom_text(data = titleLabeller,
+            x = 0, y = 71,
             aes(label = label),
-            size  = 4) +
-  
+            size  = 5) +
+  geom_text(data = indexLabeller,
+            x = -28, y = 73.3,
+            aes(label = label),
+            size  = 6,
+            fontface = "bold") +
+
   # Set theme parameters
   theme_void() +
   theme(plot.background = element_rect(fill = "white",
@@ -172,119 +189,9 @@ ggsave(filename = paste0("../Plots/", "Climate_similarity.png"),
        dpi = 600,
        units = "px", width = 8000, height = 7000)
 
-# Remove redundant objects and clear memory
-rm(climQuantsMerge_df)
-gc()
-
-# ASSESS CLIMATE VARIABLES TOGETHER -----------------------------
-
-# Find cells which are within a given quantile for all climate covariates
-allQuants <- min(climQuantsMerge)
-
-# Plot
-allQuantMap <- ggplot(data = as.data.frame(allQuants, xy = TRUE) %>%
-                        na.omit()) +
-  
-  # Set equal coordinates
-  coord_equal() +
-
-  # Climate raster
-  geom_tile( aes(x = x, y = y,
-                 colour = factor(min), fill = factor(min))) +
-  
-  # Set colour
-  scale_colour_manual("Climate\nsimilarity\nquantile",
-                      values = plotColours,
-                      labels = plotLabels,
-                      breaks = plotBreaks,
-                      aesthetics = c("colour", "fill")) +
-
-  # Country boundary polygons and sites
-  geom_sf(data = st_as_sf(land), fill = NA,
-          colour = "black", inherit.aes = FALSE) +
-  geom_sf(data = st_as_sf(sites),
-          colour = "#D91630", inherit.aes = FALSE) +
-  
-  # Add title
-  annotate(geom="text", 
-           x=-5, y=70, 
-           label = "Overall climate similarity to\npotential UK translocation sites", 
-           size = 10) +
-  
-  # Set theme parameters
-  theme_void() +
-  theme(plot.background = element_rect(fill = "white",
-                                       colour = "white"),
-        legend.position = c(0.15,0.5),
-        legend.title = element_text(size=24),
-        legend.text = element_text(size=24))
-
-# Save
-ggsave(filename = paste0("../Plots/", "Climate_similarity_all.png"),
-       allQuantMap,
-       dpi = 600,
-       units = "px", width = 8000, height = 7000)
-
-# ASSESS CLIMATE VARIABLES TOGETHER (WITHOUT RAINFALL) ----------------------
-
-# Find cells which are within a given quantile for all climate covariates
-tempQuants <- subset(climQuantsMerge,
-                     "totalRain",
-                     negate = TRUE) %>%
-  min
-
-# Plot
-tempQuantMap <- ggplot(data = as.data.frame(tempQuants, xy = TRUE) %>% 
-                         na.omit()) +
-  
-  # Set equal coordinates
-  coord_equal() +
-  
-  # Climate raster
-  geom_tile( aes(x = x, y = y,
-                 colour = factor(min), fill = factor(min))) +
-  
-  # Set colour
-  scale_colour_manual("Climate\nsimilarity\nquantile",
-                      values = plotColours,
-                      labels = plotLabels,
-                      breaks = plotBreaks,
-                      aesthetics = c("colour", "fill")) +
-  
-  # Country boundary polygons and sites
-  geom_sf(data = st_as_sf(land), fill = NA,
-          colour = "black", inherit.aes = FALSE) +
-  geom_sf(data = st_as_sf(sites),
-          colour = "#D91630", inherit.aes = FALSE) +
-  
-  # Add title
-  annotate(geom="text", 
-           x=-5, y=70, 
-           label = "Overall climate similarity to\npotential UK translocation sites", 
-           size = 10) +
-  
-  # Set theme parameters
-  theme_void() +
-  theme(plot.background = element_rect(fill = "white",
-                                       colour = "white"),
-        legend.position = c(0.15,0.5),
-        legend.title = element_text(size=24),
-        legend.text = element_text(size=24))
-
-# Save
-ggsave(filename = paste0("../Plots/", "Climate_similarity_temp.png"),
-       tempQuantMap,
-       dpi = 600,
-       units = "px", width = 8000, height = 7000)
-
 # SAVE SPATRASTERS --------------------------------------------------
 
 # Save separate climate variables
 writeRaster(climQuantsMerge,
             paste0("../Data/ProcessedData/climQuantsMerge.tif"),
-            overwrite = TRUE)
-
-# Save all climate variables
-writeRaster(allQuants,
-            paste0("../Data/ProcessedData/climQuantsAll.tif"),
             overwrite = TRUE)

@@ -32,7 +32,7 @@ climQuantsMerge <- rast("../Data/ProcessedData/climQuantsMerge.tif")
 land <- vect("../Data/land.shp")
 
 # Species records
-BVW_records <- vect("../Data/BVW_records.shp")
+BVW_records <- vect("../Data/ProcessedData/BVW_records.shp")
 
 # Reintroduction sites
 sites <- vect("../Data/reintroductionSites.shp",
@@ -72,8 +72,8 @@ tempQuants <- subset(climQuantsMerge,
 # Extract temperature quantile (into "min" column)
 BVW_records <- terra::extract(tempQuants, BVW_records, bind = TRUE)
 
-# Add column for plot (are coordinates within 20% quantile or not)
-BVW_records$similarity <- if_else(BVW_records$min == 4, "Similar", "Not similar")
+# Add column for plot (are records within 30% quantile [>=3]or not)
+BVW_records$similarity <- if_else(BVW_records$min >= 3, "Similar", "Not similar")
 
 # Drop "min" column
 BVW_records$min <- NULL
@@ -93,7 +93,10 @@ for (i in c("extentBrittany", "extentPyrenees")) {
   zoomBVW_records <- BVW_records %>%
     subset(BVW_records$plotType == "Current") %>%
     crop(get(i))
-    
+  
+  # Sort to ensure similar points are placed on top
+  zoomBVW_records <- sort(zoomBVW_records, "similarity")
+
 # Plot
 tempQuantMap <- ggplot(data = as.data.frame(zoomQuants, xy = TRUE) %>% 
                          na.omit()) +
@@ -109,11 +112,11 @@ tempQuantMap <- ggplot(data = as.data.frame(zoomQuants, xy = TRUE) %>%
   geom_sf(data = st_as_sf(zoomLand), fill = NA,
           colour = "black") +
   
-  # Plot records outside top 20% quantile
+  # Plot records
   geom_sf(data = st_as_sf(zoomBVW_records),
           inherit.aes = FALSE,
-          aes( colour = similarity),
-          size = 0.5) +
+          aes(colour = similarity),
+          size = 0.8) +
   
   # Set aesthetics
   scale_fill_manual("\nClimate\nsimilarity\nquantile",
@@ -122,7 +125,7 @@ tempQuantMap <- ggplot(data = as.data.frame(zoomQuants, xy = TRUE) %>%
                       breaks = plotBreaks) +
   scale_colour_manual("",
                     values = c("#EBCC2A", "#F21A00"),
-                    labels = c("Records within\n20% temperature\nquantile\n",
+                    labels = c("Records within\n30% temperature\nquantile\n",
                                "Other records"),
                     breaks = c("Similar", "Not similar")) +
   guides(colour = guide_legend(override.aes = list(size = 6))) +
@@ -182,8 +185,8 @@ combinedPlot <- ggdraw() +
             0.5, 0, 0.5, 1) +
   draw_plot(extentBrittany_overview, 0, 0.05, 0.25, 0.25) +
   draw_plot(extentPyrenees_overview, 0.8, 0.05, 0.25, 0.25) +
-  cowplot::draw_label("(a)", 0.015, 0.96, size = 22) +
-  cowplot::draw_label("(b)", 0.525, 0.96, size = 22) +
+  draw_label("(a)", 0.015, 0.96, size = 22) +
+  draw_label("(b)", 0.525, 0.96, size = 22) +
   theme(plot.background = element_rect( fill = "white", colour = "white"))
   
 # Add legend
@@ -192,7 +195,7 @@ combinedPlot <- plot_grid(combinedPlot,
                           rel_widths = c(3, .5))
 
 # Save
-ggsave(filename = paste0("../Plots/", "zoomRecords.png"),
+ggsave(filename = paste0("../Plots/", "Records_climate_overlay.png"),
        combinedPlot,
        dpi = 600,
        units = "px", width = 8000, height = 3000)

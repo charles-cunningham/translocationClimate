@@ -125,7 +125,7 @@ BVW_plot_vect <- BVW_vect[,"plotType"]
 
 # Save for future plotting
 writeVector(BVW_plot_vect,
-            "../Data/BVW_records.shp",
+            "../Data/ProcessedData/BVW_records.shp",
             overwrite = TRUE)
 
 # PLOT RECORDS FROM LAST 10 YEARS -----------------------------------
