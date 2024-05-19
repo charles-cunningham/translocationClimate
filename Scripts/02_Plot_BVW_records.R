@@ -33,12 +33,8 @@ terraOptions(memfrac = 0.9)
 # Land map
 land <- vect("../Data/land.shp")
 
-# Reintroduction sites
-sites <- vect("../Data/reintroductionSites.shp",
-              crs = "EPSG:4326")
-
 # Species records
-BVW_df <- read.table("../Data/SpeciesData/occurrence.txt",
+BVW_df <- read.table("../Data/RawData/SpeciesData/occurrence.txt",
                           sep="\t",
                           fill=TRUE,
                           header=TRUE,
@@ -152,7 +148,7 @@ plotCurrent <- BVW_plot_vect %>%
   theme(plot.background = element_rect( fill = "white", colour = "white"))
 
 # Save
-ggsave(filename = paste0("../Plots/", "Current_BVW_records.png"),
+ggsave(filename = paste0("../Plots/", "BVW_records_current.png"),
        plotCurrent,
        dpi = 600,
        units = "px", width = 8000, height = 7000)
@@ -181,7 +177,7 @@ plotGB <- BVW_plot_vect %>%
   theme(plot.background = element_rect( fill = "white", colour = "white"))
 
 # Save
-ggsave(filename = paste0("../Plots/", "GB_BVW_records.png"),
+ggsave(filename = paste0("../Plots/", "BVW_records_GB.png"),
        plotGB,
        dpi = 600,
        units = "px", width = 8000, height = 7000)
@@ -222,7 +218,7 @@ plotAll <- BVW_plot_vect %>%
         plot.background = element_rect( fill = "white", colour = "white"))
 
 # Save
-ggsave(filename = paste0("../Plots/", "BVW_records.png"),
+ggsave(filename = paste0("../Plots/", "BVW_records_GB_and_current.png"),
        plotAll,
        dpi = 600,
        units = "px", width = 8000, height = 7000)

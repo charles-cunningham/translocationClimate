@@ -27,7 +27,7 @@ terraOptions(memfrac = 0.9)
 # SET PARAMETERS AND LIST DIRECTORIES ------------------------------
 
 # Data directory
-dataDir <-  "../Data/ClimateData"
+dataDir <-  "../Data/RawData/ClimateData"
 
 # LOAD COUNTRY BOUNDARIES -------------------------------------------
 
