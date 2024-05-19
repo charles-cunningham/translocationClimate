@@ -32,7 +32,7 @@ land <- vect("../Data/land.shp")
 BVW_records <- vect("../Data/ProcessedData/BVW_records.shp")
 
 # Reintroduction locations at different sites
-locations <- read.csv("../Data/RawData/possible_locations_EPSG_4236.csv") %>%
+locations <- read.csv("../Data/RawData/possible_locations.csv") %>%
   vect(.,
        geom = c("Longitude", "Latitude"),
        crs = "EPSG:4326")

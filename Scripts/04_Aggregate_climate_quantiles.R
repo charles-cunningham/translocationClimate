@@ -29,7 +29,7 @@ terraOptions(memfrac = 0.9)
 land <- vect("../Data/land.shp")
 
 # Reintroduction locations at different sites
-locations <- read.csv("../Data/RawData/possible_locations_EPSG_4236.csv") %>%
+locations <- read.csv("../Data/RawData/possible_locations.csv") %>%
   vect(.,
        geom = c("Longitude", "Latitude"),
        crs = "EPSG:4326")
