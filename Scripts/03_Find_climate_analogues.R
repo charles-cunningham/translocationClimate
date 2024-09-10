@@ -78,7 +78,7 @@ indexLabeller <- data.frame(
                       "MTCO",
                       "tasCV",
                       "totalRain"),
-  label = c("(a)", "(b)", "(c)", "(d)"))
+  label = c("a", "b", "c", "d"))
 
 # EXTRACT CLIMATE NEAR POTENTIAL REINTRODUCTION SITES --------------------
 
@@ -196,9 +196,9 @@ for (i in siteNames) {
               aes(label = label),
               size  = 5) +
     geom_text(data = indexLabeller,
-              x = -28, y = 73.3,
+              x = -32, y = 72.8,
               aes(label = label),
-              size  = 6,
+              size  = 10,
               fontface = "bold") +
     
     # Set theme parameters
@@ -210,7 +210,7 @@ for (i in siteNames) {
       legend.text = element_text(size = 18),
       legend.direction = "horizontal",
       strip.text = element_blank(),
-      plot.margin = margin(0, -1, 2, -1, "lines"))
+      plot.margin = margin(0, -1.2, 2, 0, "lines"))
   
   # Save
   ggsave(

@@ -18,7 +18,6 @@
 library(terra)
 library(sf)
 library(tidyverse)
-library(cowplot)
 
 # Set fraction of RAM that may be used by the program
 terraOptions(memfrac = 0.9)
@@ -68,7 +67,7 @@ titleLabeller <- data.frame(
 indexLabeller <- data.frame(
   aggregationType = c("All",
                       "Temperature only"),
-  label = c("(a)", "(b)"))
+  label = c("a", "b"))
 
 # LOOP THROUGH SITES -------------------------------------------
 
@@ -81,7 +80,7 @@ for (i in unique(locations$Site)) {
   # Load climate quantile data for site i
   climQuantsMerge <- paste0("../Data/ProcessedData/climQuantsMerge_", i, ".tif") %>%
     rast
-
+  
 # AGGREATE CLIMATE QUANTILES -----------------------------------------
   
   # Find cells which are within a given quantile for all climate variables
@@ -141,9 +140,9 @@ for (i in unique(locations$Site)) {
               size  = 5) +
     
     geom_text(data = indexLabeller,
-              x = -28, y = 73.3,
+              x = -32, y = 72.8,
               aes(label = label),
-              size  = 6,
+              size  = 10,
               fontface = "bold") +
     
     # Set theme parameters
@@ -155,14 +154,14 @@ for (i in unique(locations$Site)) {
       legend.text = element_text(size = 18),
       legend.direction = "horizontal",
       strip.text = element_blank(),
-      plot.margin = margin(0, -1, 0, -1, "lines")
+      plot.margin = margin(0, -1, 0, 0, "lines")
     )
   
   # Save
   ggsave(filename = paste0("../Plots/", i, "/Aggregated_similarity_combined.png"),
          combinedQuantMap,
          dpi = 600,
-         units = "px", width = 8000, height = 4000)
+         units = "px", width = 8000, height = 3800)
   
   # Remove objects and free unused memory
   rm(combinedQuants, combinedQuants_df, combinedQuantMap)
@@ -261,7 +260,8 @@ for (i in unique(locations$Site)) {
       plot.background = element_rect(fill = "white", colour = "white"),
       legend.position = c(0.15, 0.5),
       legend.title = element_text(size = 24),
-      legend.text = element_text(size = 24)
+      legend.text = element_text(size = 24),
+      plot.margin = margin(0, -1.2, 0, 0, "lines")
       )
 
   # Save, with large text title

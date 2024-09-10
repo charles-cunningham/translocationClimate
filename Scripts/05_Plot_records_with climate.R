@@ -127,10 +127,6 @@ for (i in unique(locations$Site)) {
     # Set theme parameters
 
     theme_void() +
-    
-    # Set aesthetics
-
-    theme_void() +
     theme(legend.position = c(0.15,0.4),
           legend.title = element_text(size=24),
           legend.text = element_text(size=24),
@@ -191,8 +187,8 @@ for (i in unique(locations$Site)) {
   
       # Set theme parameters
       theme_void() +
-      theme(legend.title = element_text(size = 14),
-            legend.text = element_text(size = 14))
+      theme(legend.title = element_text(size = 20),
+            legend.text = element_text(size = 20))
 
     # Assign to object
     assign(paste0(j, "_panel"), tempQuantMap)
@@ -231,31 +227,68 @@ for (i in unique(locations$Site)) {
 
   }
 
-# COMBINE PANELS INTO SINGLE PLOT ------------------------------
+# COMBINE PANELS INTO SINGLE PLOTS ------------------------------
 
   # Extract legend from one panel
   legend <- get_legend(extentPyrenees_panel)
+  
+  ### ALL PLOTS
 
   # Add plots together
   combinedPlot <- ggdraw() +
+    draw_plot(quantRecordsMap + 
+                # Plot zoomed extents
+                geom_rect(data = extentBrittany %>% t %>% data.frame(),
+                          aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                          fill = NA, col = "black") +
+                geom_rect(data = extentPyrenees %>% t %>% data.frame(),
+                          aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                          fill = NA, col = "black") +
+                theme(legend.position="none"),
+              0, 0.33, 1, 0.67) +
+    draw_plot(legend, 0.01, 0.38, 0.3, 0.3 ) +
+    draw_plot(extentBrittany_panel + theme(legend.position="none"),
+              0, 0, 0.55, 0.34) +
+    draw_plot(extentPyrenees_panel + theme(legend.position="none"),
+              0.45, 0, 0.55, 0.34) +
+    draw_label("a", 0.02, 0.98, size = 32) +
+    draw_label("b", 0.02, 0.32, size = 32) +
+    draw_label("c", 0.52, 0.32, size = 32) +
+    theme(plot.background = element_rect( fill = "white", colour = "white"))
+
+  # Save
+  ggsave(filename = paste0("../Plots/", i, "/BVW_records_similarity_all.png"),
+         combinedPlot,
+         dpi = 600,
+         units = "px", width = 6800, height = 8000)
+
+  ### ZOOMED IN MAPS ONLY
+
+  # Extract legend from one panel
+  legend <- get_legend(extentPyrenees_panel +
+                         theme(legend.title = element_text(size = 14),
+                               legend.text = element_text(size = 14)))
+  
+  # Add plots together
+  zoomedPlot <- ggdraw() +
     draw_plot(extentBrittany_panel + theme(legend.position="none"),
               0, 0, 0.5, 1) +
     draw_plot(extentPyrenees_panel + theme(legend.position="none"),
               0.5, 0, 0.5, 1) +
     draw_plot(extentBrittany_overview, 0, 0.05, 0.25, 0.25) +
     draw_plot(extentPyrenees_overview, 0.8, 0.05, 0.25, 0.25) +
-    draw_label("(a)", 0.015, 0.96, size = 22) +
-    draw_label("(b)", 0.525, 0.96, size = 22) +
+    draw_label("a", 0.015, 0.95, size = 30) +
+    draw_label("b", 0.525, 0.95, size = 30) +
     theme(plot.background = element_rect( fill = "white", colour = "white"))
-  
+
   # Add legend
-  combinedPlot <- plot_grid(combinedPlot,
+  zoomedPlot <- plot_grid(zoomedPlot,
                             legend,
                             rel_widths = c(3, .5))
 
   # Save
   ggsave(filename = paste0("../Plots/", i, "/BVW_records_similarity_zoom.png"),
-         combinedPlot,
+         zoomedPlot,
          dpi = 600,
          units = "px", width = 8000, height = 3000)
 }

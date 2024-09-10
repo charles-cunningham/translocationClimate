@@ -20,6 +20,7 @@
 library(terra)
 library(sf)
 library(tidyverse)
+library(cowplot)
 
 # Set fraction of RAM that may be used by the program
 terraOptions(memfrac = 0.9)
@@ -352,11 +353,20 @@ RAINmap <- ggplot(data = as.data.frame(RAIN_R, xy = TRUE) %>% na.omit()) +
         plot.margin = margin(-4,0,-4,0, "lines"))
 
 # Aggregate all climate covariate maps together
-allClimateMap <- gridExtra::arrangeGrob(GDD5map, MTCOmap, tasCVmap, RAINmap,
-                                        nrow = 2, ncol = 2)
+allClimateMap <- ggdraw() +
+  draw_plot(GDD5map, 0, 0.5, 0.5, 0.5) +
+  draw_plot(MTCOmap, 0.5, 0.5, 0.5, 0.5) +
+  draw_plot(tasCVmap, 0, 0, 0.5, 0.5) +
+  draw_plot(RAINmap, 0.5, 0, 0.5, 0.5) +
+  draw_label("a", 0.012, 0.982, size = 30) +
+  draw_label("b", 0.512, 0.982, size = 30) +
+  draw_label("c", 0.012, 0.482, size = 30) +
+  draw_label("d", 0.512, 0.482, size = 30) +
+  theme(plot.background = element_rect( fill = "white", colour = "white"),
+        plot.margin = margin(0, -1, -1.5, 0, "lines"))
 
 # Save to .png file
 ggsave(filename = paste0("../Plots/", "Climate_covariate_means.png"),
        allClimateMap,
        dpi = 600,
-       units = "px", width = 8000, height = 7000)
+       units = "px", width = 8000, height = 6800)
