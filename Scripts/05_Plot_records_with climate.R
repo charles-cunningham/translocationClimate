@@ -251,9 +251,9 @@ for (i in unique(locations$Site)) {
               0, 0, 0.55, 0.34) +
     draw_plot(extentPyrenees_panel + theme(legend.position="none"),
               0.45, 0, 0.55, 0.34) +
-    draw_label("a", 0.02, 0.98, size = 32) +
-    draw_label("b", 0.02, 0.32, size = 32) +
-    draw_label("c", 0.52, 0.32, size = 32) +
+    draw_label("a", 0.02, 0.98, size = 34) +
+    draw_label("b", 0.02, 0.32, size = 34) +
+    draw_label("c", 0.52, 0.32, size = 34) +
     theme(plot.background = element_rect( fill = "white", colour = "white"))
 
   # Save

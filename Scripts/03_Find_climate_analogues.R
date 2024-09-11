@@ -194,7 +194,7 @@ for (i in siteNames) {
     geom_text(data = titleLabeller,
               x = 0, y = 71,
               aes(label = label),
-              size  = 5) +
+              size  = 6) +
     geom_text(data = indexLabeller,
               x = -32, y = 72.8,
               aes(label = label),

@@ -80,7 +80,7 @@ for (i in unique(locations$Site)) {
   # Load climate quantile data for site i
   climQuantsMerge <- paste0("../Data/ProcessedData/climQuantsMerge_", i, ".tif") %>%
     rast
-  
+
 # AGGREATE CLIMATE QUANTILES -----------------------------------------
   
   # Find cells which are within a given quantile for all climate variables
@@ -137,7 +137,7 @@ for (i in unique(locations$Site)) {
     geom_text(data = titleLabeller,
               x = 0, y = 71.2,
               aes(label = label),
-              size  = 5) +
+              size  = 6) +
     
     geom_text(data = indexLabeller,
               x = -32, y = 72.8,
