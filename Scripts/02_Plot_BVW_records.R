@@ -40,6 +40,12 @@ BVW_df <- read.table("../Data/RawData/SpeciesData/occurrence.txt",
                           header=TRUE,
                           quote="") 
 
+# Reintroduction locations at different sites
+locations <- read.csv("../Data/RawData/possible_locations.csv") %>%
+  vect(.,
+       geom = c("Longitude", "Latitude"),
+       crs = "EPSG:4326")
+
 # PROCESS DATA -------------------------------------------
 
 ### INITIAL CHECKS
@@ -182,13 +188,17 @@ ggsave(filename = paste0("../Plots/", "BVW_records_GB.png"),
        dpi = 600,
        units = "px", width = 8000, height = 7000)
 
-# PLOT BOTH RECORDS FROM LAST 10 YEARS & PRE-1925 RECORDS FOR GB ----
+# PLOT RECORDS FROM LAST 10 YEARS & PRE-1925 RECORDS FOR GB, WITH SITES --------
 
+# Get unique sites
+siteNames <- unique(locations$Site)
+
+# Create plot
 plotAll <- BVW_plot_vect %>%
-  
+    
   # Filter data to remove records not in either plot type
   subset(!is.na(BVW_plot_vect$plotType)) %>%
-
+  
   # Convert to sf
   st_as_sf(.) %>%
   
@@ -202,23 +212,53 @@ plotAll <- BVW_plot_vect %>%
   geom_sf(aes(colour = plotType)) +
   
   # Set colour
-  scale_colour_manual("",
-                      values = c("#EBCC2A", "#3B9AB2"),
-                      labels = c("2014-2023 records",
-                                 "Pre-1925 GB records"),
-                      breaks = c( "Current", "GB_pre-1925"),
-                      aesthetics = c("colour", "fill")) +
+  scale_colour_manual(
+    "",
+    values = c("#EBCC2A", "#3B9AB2"),
+    labels = c("2014-2023 records", "Pre-1925 GB records"),
+    breaks = c("Current", "GB_pre-1925"),
+    aesthetics = c("colour", "fill")
+  ) +
   guides(colour = guide_legend(override.aes = list(size = 10))) +
   
   # Set aesthetics
   theme_void() +
-  theme(legend.position = c(0.15,0.4),
-        legend.title = element_text(size=24),
-        legend.text = element_text(size=24),
-        plot.background = element_rect( fill = "white", colour = "white"))
+  theme(
+    legend.position = c(0.15, 0.4),
+    legend.title = element_text(size = 24),
+    legend.text = element_text(size = 24),
+    plot.background = element_rect(fill = "white", colour = "white")
+  )
 
-# Save
-ggsave(filename = paste0("../Plots/", "BVW_records_GB_and_current.png"),
-       plotAll,
-       dpi = 600,
-       units = "px", width = 8000, height = 7000)
+# Start loop through different sites here, with additional plot without sites
+for (i in c(siteNames, "noSite")) {
+  
+  # If plot doesn't include a site, identical to plotAll
+  if (i == "noSite") { plotAll_sites <- plotAll }
+  
+  # If plot includes a site...
+  if (i != "noSite") {
+    
+    # Subset to site i, and only select first location for plot
+    site_i <- terra::subset(locations, locations$Site == i)[1]
+    
+    # Add site to plot (red triangle)
+    plotAll_sites <- plotAll +
+      geom_sf(
+        data = st_as_sf(site_i),
+        fill = "#D91630",
+        colour = "black",
+        size = 3,
+        shape = 24,
+        inherit.aes = FALSE)
+  }
+  
+  # Save
+  ggsave(
+    filename = paste0("../Plots/", "BVW_records_GB_and_current_", i, ".png"),
+    plotAll_sites,
+    dpi = 600,
+    units = "px",
+    width = 8000,
+    height = 7000)
+}
